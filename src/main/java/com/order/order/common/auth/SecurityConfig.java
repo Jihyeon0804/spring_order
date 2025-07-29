@@ -40,7 +40,8 @@ public class SecurityConfig {
                         e.authenticationEntryPoint(jwtAuthenticationHandler)           // 401의 경우
                                 .accessDeniedHandler(jwtAuthorizationHandler)          // 403의 경우
                 )
-                .authorizeHttpRequests(a -> a.requestMatchers("/member/create", "/member/doLogin")
+                .authorizeHttpRequests(a
+                        -> a.requestMatchers("/member/create", "/member/doLogin", "/member/refresh_at", "/product/list", "/product/detail/{id}")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
