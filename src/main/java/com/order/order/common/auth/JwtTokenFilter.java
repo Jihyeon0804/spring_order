@@ -35,6 +35,7 @@ public class JwtTokenFilter extends GenericFilter {
                 return;
             }
 
+            // Auth Type이 Bearer Token 인 경우 토큰 앞에 bearer이 붙어서 나가기 때문에 잘라주어야 함.
             String token = bearerToken.substring(7);
 
             Claims claims = Jwts.parserBuilder()
