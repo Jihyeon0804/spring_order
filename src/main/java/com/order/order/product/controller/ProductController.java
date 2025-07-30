@@ -4,6 +4,7 @@ import com.order.order.common.dto.CommonDTO;
 import com.order.order.product.domain.ProductSearchDTO;
 import com.order.order.product.dto.ProductCreateDTO;
 import com.order.order.product.dto.ProductResDTO;
+import com.order.order.product.dto.ProductUpdateDTO;
 import com.order.order.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class ProductController {
                 .status_message("상품 등록 성공").build(), HttpStatus.CREATED);
     }
 
+    // 상품 목록 조회 + 페이징 처리 + 검색
     @GetMapping("/list")
     public ResponseEntity<?> findAll(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable
             , ProductSearchDTO productSearchDTO) {
@@ -44,11 +46,24 @@ public class ProductController {
                 .status_message("상품 목록 조회 성공").build(), HttpStatus.OK);
     }
 
+    // 상품 상세 정보 조회
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id) {
         return new ResponseEntity<>(CommonDTO.builder()
                 .result(productService.findById(id))
                 .status_code(HttpStatus.OK.value())
                 .status_message("상품 상세 조회 성공").build(), HttpStatus.OK);
+    }
+    
+    // 상품 수정
+    // 기존 이미지 삭제 후 새로운 이미지 등록 및 url 변경
+    // s3에서 이미지 삭제 방법 : url로 삭제하기는 어렵고 파일명 삭제
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute ProductUpdateDTO productUpdateDTO) {
+        Long productId = productService.update(id, productUpdateDTO);
+        return new ResponseEntity<>(CommonDTO.builder()
+                .result(productId)
+                .status_code(HttpStatus.OK.value())
+                .status_message("상품 수정 성공").build(), HttpStatus.OK);
     }
 }
