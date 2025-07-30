@@ -2,6 +2,7 @@ package com.order.order.product.domain;
 
 import com.order.order.common.domain.BaseTimeEntity;
 import com.order.order.member.domain.Member;
+import com.order.order.product.dto.ProductUpdateDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,13 @@ public class Product extends BaseTimeEntity {
 
     public void updateImageUrl(String imageUrl) {
         this.imagePath = imageUrl;
+    }
+
+    public void updateDTO(ProductUpdateDTO productUpdateDTO) {
+        this.category = productUpdateDTO.getCategory();
+        this.name = productUpdateDTO.getName();
+        this.price = productUpdateDTO.getPrice();
+        this.stockQuantity = productUpdateDTO.getStockQuantity();
     }
 
 }
