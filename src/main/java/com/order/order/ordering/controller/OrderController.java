@@ -21,7 +21,8 @@ public class OrderController {
     // 주문 등록
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody List<OrderCreateDTO> orderCreateDTOList) {
-        Long id = orderService.save(orderCreateDTOList);
+//        Long id = orderService.save(orderCreateDTOList);
+        Long id = orderService.saveConcurrent(orderCreateDTOList);
         return new ResponseEntity<>(CommonDTO.builder()
                 .result(id)
                 .status_code(HttpStatus.CREATED.value())
@@ -34,8 +35,17 @@ public class OrderController {
     public ResponseEntity<?> findAll() {
         return new ResponseEntity<>(CommonDTO.builder()
                 .result(orderService.findAll())
-                .status_code(HttpStatus.CREATED.value())
-                .status_message("주문 목록 조회 성공").build(), HttpStatus.CREATED);
+                .status_code(HttpStatus.OK.value())
+                .status_message("주문 목록 조회 성공").build(), HttpStatus.OK);
+    }
+    
+    // 나의 주문 목록 조회
+    @GetMapping("/myOrders")
+    public ResponseEntity<?> myOrders() {
+        return new ResponseEntity<>(CommonDTO.builder()
+                .result(orderService.findAllByMemberId())
+                .status_code(HttpStatus.OK.value())
+                .status_message("나의 주문 목록 조회 성공").build(), HttpStatus.OK);
     }
 
 }
