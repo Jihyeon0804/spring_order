@@ -1,5 +1,6 @@
 package com.order.order.product.service;
 
+import com.order.order.common.service.StockInventoryService;
 import com.order.order.member.domain.Member;
 import com.order.order.member.repository.MemberRepository;
 import com.order.order.product.domain.Product;
@@ -41,6 +42,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final S3Client s3Client;
+    private final StockInventoryService stockInventoryService;
 
     // 상품 등록
     public Long save(ProductCreateDTO productCreateDTO) {
@@ -73,8 +75,11 @@ public class ProductService {
             // S3에서 이미지 url 추출
             String imgUrl = s3Client.utilities().getUrl(a -> a.bucket(bucket).key(fileName)).toExternalForm();
             product.updateImageUrl(imgUrl);
-
         }
+
+        // 상품 등록 시 redis에 재고 세팅
+        stockInventoryService.makeStockQuantity(product.getId(), product.getStockQuantity());
+
         return product.getId();
     }
 
