@@ -15,7 +15,7 @@ public class OrderDetailResDTO {
     private String productName;
     private int productCount;
 
-    public static OrderDetailResDTO  fromEntity(OrderDetail orderDetail) {
+    public static OrderDetailResDTO fromEntity(OrderDetail orderDetail) {
         return OrderDetailResDTO.builder()
                 .id(orderDetail.getId())
                 .productName(orderDetail.getProduct().getName())
