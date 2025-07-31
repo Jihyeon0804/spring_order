@@ -34,6 +34,10 @@ public class Product extends BaseTimeEntity {
         this.imagePath = imageUrl;
     }
 
+    public void updateStockQuantity(int productCount) {
+        this.stockQuantity -= productCount;
+    }
+
     public void updateDTO(ProductUpdateDTO productUpdateDTO) {
         this.category = productUpdateDTO.getCategory();
         this.name = productUpdateDTO.getName();
