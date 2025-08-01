@@ -12,10 +12,9 @@ import java.util.List;
 
 @Builder
 @Entity
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@Data
 public class Ordering extends BaseTimeEntity {
 
     @Id
@@ -33,4 +32,8 @@ public class Ordering extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "ordering", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<OrderDetail> orderDetailList = new ArrayList<>();
+
+    public void cancelStatus() {
+        this.orderStatus = OrderStatus.CANCELED;
+    }
 }
