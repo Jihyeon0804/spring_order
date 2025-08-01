@@ -142,7 +142,7 @@ public class OrderService {
     public List<OrderListResDTO> findAllByMemberId() {
         Member member = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).orElseThrow();
         Long id = memberRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName())
-                .orElseThrow(() -> new EntityNotFoundException("")).getId();
+                .orElseThrow(() -> new EntityNotFoundException("member is not found")).getId();
         List<Ordering> orderList = orderRepository.findAllByMemberId(id);
         List<OrderListResDTO> orderListResDTOList = new ArrayList<>();
         for (Ordering ordering : orderList) {
