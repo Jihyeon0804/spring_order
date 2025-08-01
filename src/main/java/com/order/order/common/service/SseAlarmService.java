@@ -34,7 +34,7 @@ public class SseAlarmService implements MessageListener {
                 .receiver(receiver)
                 .orderingId(orderingId).build();
 
-        // json 으로 조립
+        // 보낼 데이터를 json 형식으로 조립
         ObjectMapper objectMapper = new ObjectMapper();
         String data;
         try {
