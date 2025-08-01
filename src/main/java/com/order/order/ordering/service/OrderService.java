@@ -1,10 +1,12 @@
 package com.order.order.ordering.service;
 
+import com.order.order.common.service.SseAlarmService;
 import com.order.order.common.service.StockInventoryService;
 import com.order.order.common.service.StockRabbitMqService;
 import com.order.order.member.domain.Member;
 import com.order.order.member.repository.MemberRepository;
 import com.order.order.ordering.domain.OrderDetail;
+import com.order.order.ordering.domain.OrderStatus;
 import com.order.order.ordering.domain.Ordering;
 import com.order.order.ordering.dto.OrderCreateDTO;
 import com.order.order.ordering.dto.OrderDetailResDTO;
@@ -34,6 +36,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final StockInventoryService stockInventoryService;
     private final StockRabbitMqService stockRabbitMqService;
+    private final SseAlarmService sseAlarmService;
 
     // 주문 생성
     // 메서드 앞에 synchronized 를 붙여 동시성 문제를 해결하려고 해도 제3의 시스템(DB 등) 도 멀티스레드로 동작하기 때문에 여전히 해결 안됨
@@ -54,11 +57,9 @@ public class OrderService {
             }
 
             // 상품 재고 조정
-            // 1. 동시에 접근하는 상황에서 update 값의 정합성이 꺠지고 갱신 이상 발생 (주문은 100개인데, 재고는 50개만 빠진 경우)
-            // 2. spring 버전이나 mysql 버전에 따라 jpa에서 강제 에러 (deadlock) 를 유발시켜 대부분의 요청 실패 발생
-            // (주문 100개 중에 20개만 성공, 80개는 deadlock(교착 상태)으로 인한 에러)
-            // => 해결책
-            // 1) synchronized
+            // 1. 동시에 접근하는 상황에서 update 값의 정합성이 깨지고 갱신 이상 발생 (주문은 100개인데, 재고는 50개만 빠진 경우)
+            // 2. spring 버전이나 mysql 버전에 따라 jpa 에서 강제 에러 (deadlock) 를 유발시켜 대부분의 요청 실패 발생
+            //    (주문 100개 중에 20개만 성공, 80개는 deadlock(교착 상태)으로 인한 에러)
 //            product.setStockQuantity(product.getStockQuantity() - orderCreateDTO.getProductCount());
             product.updateStockQuantity(orderCreateDTO.getProductCount());
 
@@ -109,6 +110,9 @@ public class OrderService {
         }
 
         orderRepository.save(ordering);
+        
+        // 주문 성공 시 admin 유저에게 알림 메세지 전송
+        sseAlarmService.publishMessage("admin@email.com", email, ordering.getId());
 
         return ordering.getId();
     }
@@ -156,8 +160,26 @@ public class OrderService {
         return orderListResDTOList;
 //        return orderRepository.findAllByMember(member).stream().map(OrderListResDTO::fromEntity)
 //                .collect(Collectors.toList());
+    }
+    
+    
+    // 주문 취소
+    public Ordering cancel(Long id) {
+        // Ordering의 DB 상태값 변경 (ORDERED -> CANCELED)
+        Ordering ordering = orderRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("product is not found"));
+        ordering.cancelStatus();
+        
 
+        for (OrderDetail orderDetail : ordering.getOrderDetailList()) {
 
+            // rdb에 재고 업데이트
+            orderDetail.getProduct().cancelOrder(orderDetail.getQuantity());
 
+            // redis의 재고 값 증가
+            stockInventoryService.increaseStockQuantity(orderDetail.getProduct().getId()
+                    , orderDetail.getQuantity());
+        }
+
+        return ordering;
     }
 }
