@@ -27,7 +27,7 @@ public class SseAlarmService implements MessageListener {
     }
 
     // 특정 사용자에게 메세지 발송
-    // orderingId 이후 디벨롭할 때 보낼 메세지가 들어오도록 바꾸기 (지금은 어떤 상품이 주문이 들어왔는지만 보내도록 설계)
+    // orderingId 매개변수는 이후 디벨롭할 때 보낼 메세지가 들어오도록 바꾸기 (지금은 어떤 상품이 주문이 들어왔는지만 보내도록 설계)
     public void publishMessage(String receiver, String sender, Long orderingId) {
         SseMessageDTO sseMessageDTO = SseMessageDTO.builder()
                 .sender(sender)
