@@ -1,6 +1,7 @@
 package com.order.order.ordering.controller;
 
 import com.order.order.common.dto.CommonDTO;
+import com.order.order.ordering.domain.Ordering;
 import com.order.order.ordering.dto.OrderCreateDTO;
 import com.order.order.ordering.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -48,4 +49,15 @@ public class OrderController {
                 .status_message("나의 주문 목록 조회 성공").build(), HttpStatus.OK);
     }
 
+
+    // 주문 취소 (서비스 관리자가 사용자의 주문 취소하도록 설계)
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/cancel/{id}")
+    public ResponseEntity<?> orderCancel(@PathVariable Long id) {
+        Ordering ordering = orderService.cancel(id);
+        return new ResponseEntity<>(CommonDTO.builder()
+                .result(ordering.getId())
+                .status_code(HttpStatus.OK.value())
+                .status_message("주문 취소 성공").build(), HttpStatus.OK);
+    }
 }
