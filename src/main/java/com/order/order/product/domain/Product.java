@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product extends BaseTimeEntity {
+public class  Product extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,11 +38,14 @@ public class Product extends BaseTimeEntity {
         this.stockQuantity -= productCount;
     }
 
+    public void cancelOrder(int cancelQuantity) {
+        this.stockQuantity += cancelQuantity;
+    }
+
     public void updateDTO(ProductUpdateDTO productUpdateDTO) {
         this.category = productUpdateDTO.getCategory();
         this.name = productUpdateDTO.getName();
         this.price = productUpdateDTO.getPrice();
         this.stockQuantity = productUpdateDTO.getStockQuantity();
     }
-
 }
