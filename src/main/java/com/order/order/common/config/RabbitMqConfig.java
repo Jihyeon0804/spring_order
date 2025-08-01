@@ -45,6 +45,7 @@ public class RabbitMqConfig {
         return connectionFactory;
     }
 
+    // RabbitMQ 메세지 형식 지정
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
