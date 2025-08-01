@@ -45,7 +45,7 @@ public class StockRabbitMqService {
         String messageBody = new String(message.getBody());
         ObjectMapper objectMapper = new ObjectMapper();
         StockRabbitMqDTO stockRabbitMqDTO = objectMapper.readValue(messageBody, StockRabbitMqDTO.class);
-        Product product = productRepository.findById(stockRabbitMqDTO.getProductId()).orElseThrow(() -> new EntityNotFoundException(""));
+        Product product = productRepository.findById(stockRabbitMqDTO.getProductId()).orElseThrow(() -> new EntityNotFoundException("product is not found"));
         product.updateStockQuantity(stockRabbitMqDTO.getProductCount());
     }
 
