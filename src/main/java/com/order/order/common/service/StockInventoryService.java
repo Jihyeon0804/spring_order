@@ -16,6 +16,7 @@ public class StockInventoryService {
 
     // 상품 등록 시 재고 수량 세팅
     public void makeStockQuantity(Long productId, int quantity) {
+        // redis에 재고 수량 저장
         redisTemplate.opsForValue().set(String.valueOf(productId), String.valueOf(quantity));      // 값을 key-value 형식으로 세팅
     }
     
@@ -35,7 +36,8 @@ public class StockInventoryService {
     
     
     // 주문 취소 시 재고 수량 증가
-    public void increaseStockQuantity() {
-
+    public int increaseStockQuantity(Long productId, int cancelQuantity) {
+        Long finalRemains = redisTemplate.opsForValue().increment(String.valueOf(productId), cancelQuantity);
+        return finalRemains.intValue();
     }
 }
