@@ -34,18 +34,20 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource(corsConfiguration()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(s
+                        -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e ->
                         e.authenticationEntryPoint(jwtAuthenticationHandler)           // 401의 경우
                                 .accessDeniedHandler(jwtAuthorizationHandler)          // 403의 경우
                 )
                 .authorizeHttpRequests(a
-                        -> a.requestMatchers("/member/create", "/member/doLogin", "/member/refresh_at", "/product/list", "/product/detail/{id}")
+                        -> a.requestMatchers("/member/create", "/member/doLogin", "/member/refresh_at"
+                                , "/product/list", "/product/detail/{id}"
+                                , "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
-
                 .build();
     }
 
