@@ -1,6 +1,7 @@
 package com.order.order.common.service;
 
 import com.order.order.common.dto.CommonErrorDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.NoSuchElementException;
-
+@Hidden     // swagger 에서 제외
 @ControllerAdvice
 @Slf4j
 public class CommonExceptionHandler {
@@ -20,30 +20,35 @@ public class CommonExceptionHandler {
     // 상황에 따라 다른 에러가 파라미터로 주입됨
     public ResponseEntity<?> illegalException(IllegalArgumentException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.BAD_REQUEST.value(), e.getMessage())
+                , HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> entityNotFoundException(EntityNotFoundException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.NOT_FOUND.value(), e.getMessage())
+                , HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         String errorMessage = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
-        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.BAD_REQUEST.value(), errorMessage), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.BAD_REQUEST.value(), errorMessage)
+                , HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> exception(Exception e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage())
+                , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
-        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.FORBIDDEN.value(),  e.getMessage()), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(new CommonErrorDTO(HttpStatus.FORBIDDEN.value(),  e.getMessage())
+                , HttpStatus.FORBIDDEN);
     }
 }
